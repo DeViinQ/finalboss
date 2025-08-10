@@ -1,0 +1,51 @@
+---
+import type { GetStaticPaths } from "astro";
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { render } from "astro:content";
+
+export const getStaticPaths = async () => {
+  const posts = await getCollection("posts");
+
+  return posts.map((post) => ({
+    params: {
+      id: post.slug,
+    },
+    props: {
+      post,
+    },
+  }));
+};
+const { post } = Astro.props;
+const { data } = post;
+const { title, description, img, etiquetas, time } = data;
+const { Content } = await render(post);
+console.log(etiquetas);
+---
+
+<Layout title={title}>
+  <div class="text-center items-center text-white flex flex-col gap-y-12 mt-24">
+    <header class="flex flex-col gap-y-4">
+      <h1 class="text-4xl font-extrabold text-blue-300">{title}</h1>
+      <h3 class="text-balance text-yellow-200 font-bold">{description}</h3>
+      <img class="mx-auto" src={`../${img}`} alt={title} />
+    </header>
+    <section class="mx-78 text-left">
+      <Content />
+    </section>
+    <footer class="">
+      <ul>
+        {
+          etiquetas.map((tag) => {
+            <span class="bg-black/70 text-[10px] text-white px-2 py-0.5 rounded-full border border-gray-700">
+              {tag}
+            </span>;
+          })
+        }
+      </ul>
+      <span class="text-gray-800">
+        Publicado el {time}
+      </span>
+    </footer>
+  </div>
+</Layout>
